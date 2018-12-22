@@ -2,22 +2,22 @@
 # Population Simulation
 
 ### Introduction
-I have just started to learn Python and over the past couple of weeks I decided that I needed a project to start applying the knowledge I've learnt over various datacamp courses. I recently watched [this](https://www.youtube.com/watch?v=0ZGbIKd0XrM) very interesting video where the creator simulates a natural selection process within a population. I decided I would try and build something similar in Python as my first stab at the language. I would recommend you watch the mentioned video before continuing as it's:
+I have just started to learn Python over the past couple of weeks and I decided that I needed a project to start applying the knowledge I've learnt over various datacamp courses. I recently watched [this](https://www.youtube.com/watch?v=0ZGbIKd0XrM) very interesting video where the creator simulates a natural selection process within a population. I decided I would try and build something similar in Python as my first stab at the language. I would recommend you watch the mentioned video before continuing as it's:
 1. very interesting and
 2. much more sophisticated than what I build here.
 
 ### Outlining the Build
-We're going to be simulating days in the lives of our population. Our population live on a 15 x 15 square world and have one task and one task only in their lives, eat food. Food will grow at the beginning of each day but it is perishable and only lasts a day, it will decompose at the end of the day. Our population will start each day at camp, which is located at the origin (0,0), and will set out hunting for food to eat.  
+We're going to be simulating days in the lives of our population. Our population live on a 15 x 15 square world and have one task and one task only in their lives, eat food. Food will grow at the beginning of each day but does not last long, it will decompose at the end of the day. Our population will start each day at camp located at the origin (0,0). From here they will go out foraging for food each day.  
 
 ### Eating the Food
-As mentioned, food spawns at the beginning of each day at random locations on the map. To eat the food, an individual simply needs to land on the same square as that piece of food.
+As mentioned, food spawns at the beginning of each day at random locations on the map. To eat the food an individual simply needs to land on the same square as that piece of food.
 
 Each individual has a set amount of energy for the day and moving around will deplete energy. If an individual runs out of energy for the day before finding any food to eat then they will (sadly) die.
 
-However if an individual does happen to find something to eat, then they will consume the piece of food (so that it cannot be "eaten again"), they will then return to camp safely without worry about energy, and finally they will reproduce to create an offspring.
+However if an individual does happen to find something to eat they will: consume the piece of food (so that it cannot be "eaten again"), return to camp safely without worry about energy, and finally reproduce to create an offspring.
 
 ### Randomness
-To make this whole build worthwhile we need to add a bit of randomness, this is the genetic mutation within individuals that we can observe changing over the lifetime of our population. We will be adding some genetic diversity to the individual's energy levels. This will be implemented by occassionally adding or subtracting 1 to the energy level of each new individual in the population as they are created by our reproduction process. This way, the energy level of the offspring is dependant on the parent's energy level.
+To make this whole build worthwhile we need to add a bit of randomness, this is the genetic mutation within individuals that we can observe changing over the lifetime of our population. We will be adding some genetic diversity to the individual's energy levels. This will be implemented by occassionally adding or subtracting 1 to the energy level of each new individual in the population as they are created by our reproduction process. This way the energy level of the offspring is dependant on the parent's energy level.
 
 ### Summary
 In summary, we're doing the following:
@@ -41,15 +41,14 @@ Our first step is to import the packages that we need to use:
 import random
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-
-plt.rcParams['figure.dpi']= 1000
+import matplotlib.cm as cm
 ```
 
 * random is used to generate random numbers for movement and apply the randomness to the energy level of offspring.
 * matplotlib.pyplot and matplotlib.patches are used for plotting our outputs.
 
 #### Dictionary and Population Creation
-Now, I could be using some horrible practice here that Python folk would shun me for but the use of a dictionary for referencing purposes throughout the code seems sensible enough to me. I create the following dictionary:
+Now, I might be using some horrible practice here that Python folk will frown at me for but the use of a dictionary for referencing purposes throughout the code seems sensible enough to me. I create the following dictionary:
 
 
 ```python
@@ -89,7 +88,7 @@ def spawnPopulation(popSize, me):
     return(population)
 ```
 
-As mentioned, this function creates a population as a nested list of lists. Each list within the list contains information on a specific individual. It contains:
+As mentioned this function creates a population as a nested list of lists. Each list within the list contains information on a specific individual. It contains:
 * **name**: An integer index that allows us to identify individuals;
 * **x_pos**: The x coordinate of the individual's current position;
 * **y_pos**: The y coordinate of the individual's current position;
@@ -104,13 +103,13 @@ We can then use the dictionary approach to reference these specific pieces of in
 
 ```python
 population = spawnPopulation(10, 10)
-print(population[0:1])
+print(population)
 ```
 
-    [[0, 0, 0, 10, 10, 1, 0, 10]]
+    [[0, 0, 0, 10, 10, 1, 0, 10], [1, 0, 0, 10, 10, 1, 0, 10], [2, 0, 0, 10, 10, 1, 0, 10], [3, 0, 0, 10, 10, 1, 0, 10], [4, 0, 0, 10, 10, 1, 0, 10], [5, 0, 0, 10, 10, 1, 0, 10], [6, 0, 0, 10, 10, 1, 0, 10], [7, 0, 0, 10, 10, 1, 0, 10], [8, 0, 0, 10, 10, 1, 0, 10], [9, 0, 0, 10, 10, 1, 0, 10]]
     
 
-If we then want to reference the current x coordinate of our first individual we simply write the following:
+If we then want to reference the current x coordinate of our first individual (let's say) we simply write the following:
 
 
 ```python
@@ -124,9 +123,9 @@ print(xcoord)
 Now that we've got our initial population let's move on to moving, get it?
 
 #### Moving our Individuals
-To move our individuals we create a move() function. This function moves each individaul one square in a random direction and decreases the current energy level of the individaul accordingly. We assume our individuals have no common sense  and that their movement is random; they will even move back to the square they were JUST on despite knowing that there was no food there.
+To move our individuals we create a move() function. This function moves each individaul one square in a random direction and decreases the current energy level of the individaul accordingly. We assume our individuals have no common sense and that their movement is random; they will even move back to the square they were JUST on despite knowing that there is no food there.
 
-Also, if an individual tries to move off the map then they will simply turn around 180 degrees and move in the other direction. Here's the function:
+Also if an individual tries to move off the map then they will simply turn around 180 degrees and move in the other direction. Here's the function:
 
 
 ```python
@@ -222,7 +221,7 @@ plt.show();
 ![png](output_15_0.png)
 
 
-Now that we've got a function to grow our food, we need our individuals to be able to eat it!
+Now that we've got a function to grow our food we need our individuals to be able to eat it!
 
 ### Eating Food
 The eatFood() function cycles through each individual and each piece of food and compares the (x,y) location. If there is a match then it removes the food from the food list and changes the eaten status of the individual. It also reduces the individual to 0 for looping purposes:
@@ -398,7 +397,7 @@ We generate our birth records, used to track the population:
 population_records = list(range(kPopSize))
 ```
 
-We also initialize some empty lists: 
+We also initialize some empty lists used for tracking: 
 * **average_energy** to track the average energy of the population each day; 
 * **pop_count** to track the size of our population each day;
 * **eaten_loc** to track the frequency that food is being eaten at each location in the world.
@@ -472,7 +471,7 @@ plt.show();
 ![png](output_37_0.png)
 
 
-As expected, the energy of individuals has increased over the days. This is because a greater maximum is only a good thing. Thus, individuals with higher energy are more likely to survive and reproduce, passing on their high energy genes!
+As expected, the energy of individuals has increased over the days. Individuals with higher energy are more likely to find food before they become exhausted. They then reproduce and pass on their high energy genes!
 
 #### Development of Energy and Population
 We can also look at how the average energy and population count have developed over time:
@@ -496,7 +495,7 @@ plt.show();
 ![png](output_39_0.png)
 
 
-The energy line is consistent with the histogram from before. Interestingly, the population has also grown. There was clearly more than enough food around to sustain a greater population than we started with. The volatile shape of the population line is due to the logic used for reproduction.
+The energy line is consistent with the histogram from before. Interestingly the population plummits initially and then gradually climbs up. The volatile shape of the population line is due to the way reproduction takes place.
 
 #### Eating Locations
 We can also examine which areas in the world our individuals are most frequently eating. It will be interesting to see whether the food that grows near the top right of the world (away from the population's 'camp') is being eaten at all. We need to do a quick bit of summary work to allow us to use the colour of the dots to indicate the frequency of food consumed at each location:
@@ -525,9 +524,18 @@ x_axis = list(zip(*locs.keys()))[0]
 y_axis = list(zip(*locs.keys()))[1]
 colors = list(locs.values())
 
+# set up a color map
+colormap = cm.jet
+
+# set up our colour bar
+scalarmappaple = cm.ScalarMappable(cmap=colormap)
+scalarmappaple.set_array(colors)
+
 # And now we plot:
-plt.scatter(x = x_axis, y = y_axis, c = colors)
-plt.show();
+plt.scatter(x = x_axis, y = y_axis, c = colormap(colors))
+plt.colorbar(scalarmappaple)
+plt.title("Total Food Eaten at each Location")
+plt.show()
 ```
 
 
