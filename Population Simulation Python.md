@@ -59,26 +59,25 @@ ind_info = {
         "max_energy":3,
         "curr_energy":4,
         "speed":5,
-        "eaten":6,
-        "control":7}
+        "eaten":6}
 ```
 
 Then I create the following function that allows me to spawn my population as a nested list of lists:
 
 
 ```python
-def spawnPopulation(popSize, me):
+def spawnPopulation(popSize, startingEnergy):
     """ Spawns a population as a nested list of lists. """
     name = list(range(popSize))
     x_pos = [0] * popSize
     y_pos = [0] * popSize
-    max_energy = [me] * popSize # <- to be kept constant
+    max_energy = [startingEnergy] * popSize # <- to be kept constant
     curr_energy = max_energy[:] # <- to be updated as the individual moves
     speed = [1] * popSize
     eaten = [0] * popSize # <- indicate whether the individual has eaten
-    control = [me] * popSize # <- measures whether energy just goes up because of the lower bound
+    
     # Pull together our population using zip()
-    population_zip = zip(name, x_pos, y_pos, max_energy, curr_energy, speed, eaten, control)
+    population_zip = zip(name, x_pos, y_pos, max_energy, curr_energy, speed, eaten)
 
     # And create a list of nested lists
     population = [list(l) for l in population_zip]
@@ -95,8 +94,7 @@ As mentioned this function creates a population as a nested list of lists. Each 
 * **max_energy**: The maximum energy of the individual, this is the amount of energy that the individual will start each day with;
 * **curr_energy**: The current energy level of the individual. This will decrease as the individual moves around. NOTE: this will never be greater than the individual's maximum energy;
 * **speed**: Indicates how many squares the individual can move each turn. This is currently not used but is in place to allow further development of the build;
-* **eaten**: A binary value to indicate whether the individual has eaten this day or not;
-* **control**: Not sure what this is? (SEE WHERE THIS IS USED!)
+* **eaten**: A binary value to indicate whether the individual has eaten this day or not.
 
 We can then use the dictionary approach to reference these specific pieces of information by name rather than by index. If we spawn a population of size 10, with maximum energy of 10 we get the following:
 
@@ -106,7 +104,7 @@ population = spawnPopulation(10, 10)
 print(population)
 ```
 
-    [[0, 0, 0, 10, 10, 1, 0, 10], [1, 0, 0, 10, 10, 1, 0, 10], [2, 0, 0, 10, 10, 1, 0, 10], [3, 0, 0, 10, 10, 1, 0, 10], [4, 0, 0, 10, 10, 1, 0, 10], [5, 0, 0, 10, 10, 1, 0, 10], [6, 0, 0, 10, 10, 1, 0, 10], [7, 0, 0, 10, 10, 1, 0, 10], [8, 0, 0, 10, 10, 1, 0, 10], [9, 0, 0, 10, 10, 1, 0, 10]]
+    [[0, 0, 0, 10, 10, 1, 0], [1, 0, 0, 10, 10, 1, 0], [2, 0, 0, 10, 10, 1, 0], [3, 0, 0, 10, 10, 1, 0], [4, 0, 0, 10, 10, 1, 0], [5, 0, 0, 10, 10, 1, 0], [6, 0, 0, 10, 10, 1, 0], [7, 0, 0, 10, 10, 1, 0], [8, 0, 0, 10, 10, 1, 0], [9, 0, 0, 10, 10, 1, 0]]
     
 
 If we then want to reference the current x coordinate of our first individual (let's say) we simply write the following:
@@ -409,6 +407,15 @@ pop_count = []
 eaten_loc = []
 ```
 
+#### Set our Seed
+We set our seed for reproducibility:
+
+
+
+```python
+random.seed(1602)
+```
+
 #### Simulating
 Now we put all our functions together and let it go:
 
@@ -468,7 +475,7 @@ plt.show();
 ```
 
 
-![png](output_37_0.png)
+![png](output_39_0.png)
 
 
 As expected, the energy of individuals has increased over the days. Individuals with higher energy are more likely to find food before they become exhausted. They then reproduce and pass on their high energy genes!
@@ -492,7 +499,7 @@ plt.show();
 ```
 
 
-![png](output_39_0.png)
+![png](output_41_0.png)
 
 
 The energy line is consistent with the histogram from before. Interestingly the population plummits initially and then gradually climbs up. The volatile shape of the population line is due to the way reproduction takes place.
@@ -539,5 +546,5 @@ plt.show()
 ```
 
 
-![png](output_41_0.png)
+![png](output_43_0.png)
 
