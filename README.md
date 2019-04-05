@@ -1,2 +1,2 @@
-# LearningPython
-Short scripts documenting my learning of Python
+# PopulationSimulation
+Simulating a population in Python.
